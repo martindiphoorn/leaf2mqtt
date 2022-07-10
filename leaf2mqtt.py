@@ -31,12 +31,15 @@ def send_value(client, key, value):
     client.publish(topic, value)
     print('send: topic=' + topic + ' value=' + str(value))
 
-def retrieve_data(client, leaf):
+def retrieve_data(client, s):
     print("get_latest_battery_status from servers")
+    leaf = s.get_leaf()
     leaf_info = leaf.get_latest_battery_status()
     send_value(client, 'battery_percentage', leaf_info.battery_percent)
     send_value(client, 'is_charging', leaf_info.is_charging)
     send_value(client, 'charging_status', leaf_info.charging_status)
+    send_value(client, 'battery_capacity', leaf_info.battery_capacity)
+    send_value(client, 'battery_remaining_amount', leaf_info.battery_remaining_amount)
 
 
 print('Setting up MQTT to server: ' + mqtt_username + '@' + mqtt_host + ':' + mqtt_port)
@@ -48,9 +51,8 @@ client.connect(mqtt_host, int(mqtt_port), 60)
 
 print("Prepare Session")
 s = pycarwings2.Session(leaf_username, leaf_password, leaf_region)
-leaf = s.get_leaf()
 
-schedule.every(10).minutes.do(lambda: retrieve_data(client, leaf))
+schedule.every(10).minutes.do(lambda: retrieve_data(client, s))
 
 while True:
     schedule.run_pending()
