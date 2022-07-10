@@ -7,6 +7,7 @@ import time
 leaf_username = os.environ['LEAF_USERNAME']
 leaf_password = os.environ['LEAF_PASSWORD']
 leaf_region = os.environ['LEAF_REGION']
+leaf_polling = os.environ['LEAF_POLLING']
 
 mqtt_username = os.environ['MQTT_USERNAME']
 mqtt_password = os.environ['MQTT_PASSWORD']
@@ -52,7 +53,10 @@ client.connect(mqtt_host, int(mqtt_port), 60)
 print("Prepare Session")
 s = pycarwings2.Session(leaf_username, leaf_password, leaf_region)
 
-schedule.every(10).minutes.do(lambda: retrieve_data(client, s))
+# Poll first time
+retrieve_data(client, s)
+
+schedule.every(int(leaf_polling)).minutes.do(lambda: retrieve_data(client, s))
 
 while True:
     schedule.run_pending()

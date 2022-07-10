@@ -6,6 +6,7 @@ services:
       - LEAF_USERNAME=
       - LEAF_PASSWORD=
       - LEAF_REGION=
+      - LEAF_POLLING=10
       - MQTT_HOST=
       - MQTT_USERNAME=
       - MQTT_PASSWORD=
