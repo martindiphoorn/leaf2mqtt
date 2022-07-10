@@ -1,0 +1,3 @@
+pycarwings2
+paho-mqtt
+schedule

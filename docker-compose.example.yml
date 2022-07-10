@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  leaf2mqtt:
+    image: leaf2mqtt
+    environment:
+      - LEAF_USERNAME=
+      - LEAF_PASSWORD=
+      - LEAF_REGION=
+      - MQTT_HOST=
+      - MQTT_USERNAME=
+      - MQTT_PASSWORD=
+      - MQTT_PORT=1883
+      - MQTT_TOPIC=leaf
