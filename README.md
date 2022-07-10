@@ -21,3 +21,9 @@ Want an improvement? Open an issue or send a pull request.
 
 ## Usage
 Checkout the docker-compose for the available environment settings. And just run it!
+
+## Credits
+-  [joeshaw / carwings](https://github.com/joeshaw/carwings)
+- [abjorshammar / leaf-mqtt](https://github.com/abjorshammar/leaf-mqtt)
+
+Without these projects this project would not exist.
