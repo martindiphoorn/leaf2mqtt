@@ -40,13 +40,13 @@ def on_message(client, userdata, msg):
 
 def on_disconnect(client, userdata,  rc):
     logging.info("MQTT Disconnected, trying to reconnect...")
-    client.reconnect()
+    client.connect(mqtt_host, int(mqtt_port), 60)
 
 def send_value(client, key, value):
     topic = mqtt_topic + '/status/' + key
     if mode != 'debug':
         client.publish(topic, value)
-    logging.info('send: topic=' + topic + ' value=' + str(value))
+    logging.debug('send: topic=' + topic + ' value=' + str(value))
 
 def retrieve_data(client, s):
     logging.info("get_latest_battery_status from servers")
@@ -60,25 +60,32 @@ def retrieve_data(client, s):
     send_value(client, 'battery_capacity', leaf_info.battery_capacity)
     send_value(client, 'battery_remaining_amount', leaf_info.battery_remaining_amount)
 
+def alive(client):
+    send_value(client, 'alive', 1)
+
 
 logging.info('Setting up MQTT to server: ' + mqtt_username + '@' + mqtt_host + ':' + mqtt_port)
-client = mqtt.Client(client_id=mqtt_client_id)
+client = mqtt.Client(client_id=mqtt_client_id, clean_session=True)
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.on_message = on_message
 client.username_pw_set(mqtt_username, mqtt_password)
 client.connect(mqtt_host, int(mqtt_port), 60)
 
-logging.info("Prepare communicatoin with the leaf")
+logging.info("Prepare communication with the leaf")
 leaf_session = pycarwings2.Session(leaf_username, leaf_password, leaf_region)
 
+# Initialize schedules
+schedule.every(int(leaf_polling)).minutes.do(lambda: retrieve_data(client, leaf_session))
+schedule.every(1).minutes.do(lambda: alive(client))
+schedule.run_pending()
+
 # Fast initial retrieval
+alive(client)
 retrieve_data(client, leaf_session)
 
-# Retrieve ever x minutes
-schedule.every(int(leaf_polling)).minutes.do(lambda: retrieve_data(client, leaf_session))
 
 while True:
     schedule.run_pending()
     client.loop()
-    time.sleep(1000)
+    time.sleep(1)
