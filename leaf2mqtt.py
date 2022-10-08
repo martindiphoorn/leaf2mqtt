@@ -51,6 +51,7 @@ def send_value(client, key, value):
 def retrieve_data(client, s):
     logging.info("get_latest_battery_status from servers")
     leaf = s.get_leaf()
+    leaf.request_update()
     leaf_info = leaf.get_latest_battery_status()
     send_value(client, 'operation_date_and_time', leaf_info.answer["BatteryStatusRecords"]["OperationDateAndTime"])
     send_value(client, 'notification_date_and_time', leaf_info.answer["BatteryStatusRecords"]["NotificationDateAndTime"])
